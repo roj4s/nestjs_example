@@ -1,0 +1,41 @@
+version: '2'
+
+services:
+
+  node:
+    container_name: api
+    image: api
+    build:
+      context: ./api
+    environment:
+      - NODE_ENV=development
+    volumes:
+        - ./api:/var/www/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - nodeapp-network
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    networks:
+      - nodeapp-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - nodeapp-network
+
+networks:
+  nodeapp-network:
+    driver: bridge
